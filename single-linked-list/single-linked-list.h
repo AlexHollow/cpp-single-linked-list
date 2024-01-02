@@ -87,9 +87,9 @@ class SingleLinkedList {
         // Возвращает ссылку на самого себя
         // Инкремент итератора, не указывающего на существующий элемент списка, приводит к неопределённому поведению
         BasicIterator& operator++() noexcept {
-            if (node_ != nullptr) {
-                node_ = node_->next_node;
-            }
+            assert(node_ == nullptr);
+
+            node_ = node_->next_node;
             return *this;
         }
 
@@ -98,6 +98,8 @@ class SingleLinkedList {
         // Инкремент итератора, не указывающего на существующий элемент списка,
         // приводит к неопределённому поведению
         BasicIterator operator++(int) noexcept {
+            assert(node_ == nullptr);
+
             auto old_value(*this);
             ++(*this);
             return old_value;
@@ -107,6 +109,8 @@ class SingleLinkedList {
         // Вызов этого оператора у итератора, не указывающего на существующий элемент списка,
         // приводит к неопределённому поведению
         [[nodiscard]] reference operator*() const noexcept {
+            assert(node_ == nullptr);
+
             return node_->value;
         }
 
@@ -114,6 +118,8 @@ class SingleLinkedList {
         // Вызов этого оператора у итератора, не указывающего на существующий элемент списка,
         // приводит к неопределённому поведению
         [[nodiscard]] pointer operator->() const noexcept {
+            assert(node_ == nullptr);
+
             return &(node_->value);
         }
 
@@ -153,14 +159,9 @@ public:
 
     // Обменивает данные двух списков
     void swap(SingleLinkedList& other) noexcept {
-        Node* temp_ptr = head_.next_node;
-        size_t temp_size = size_;
-
-        head_.next_node = other.head_.next_node;
-        size_ = other.size_;
-
-        other.head_.next_node = temp_ptr;
-        other.size_ = temp_size;
+        std::swap(head_.next_node, other.head_.next_node);
+        std::swap(size_, other.size_);
+        
         return;
     }
 
@@ -188,6 +189,8 @@ public:
 
     // Удаляет элемент из начала списка
     void PopFront() noexcept {
+        assert(size_ == 0);
+
         Node* temp = head_.next_node->next_node;
         delete head_.next_node;
         head_.next_node = temp;
@@ -338,7 +341,7 @@ bool operator<(const SingleLinkedList<Type>& lhs, const SingleLinkedList<Type>& 
 
 template <typename Type>
 bool operator<=(const SingleLinkedList<Type>& lhs, const SingleLinkedList<Type>& rhs) {
-    return lhs == rhs || lhs < rhs;
+    return lhs < rhs;
 }
 
 template <typename Type>
@@ -348,5 +351,5 @@ bool operator>(const SingleLinkedList<Type>& lhs, const SingleLinkedList<Type>& 
 
 template <typename Type>
 bool operator>=(const SingleLinkedList<Type>& lhs, const SingleLinkedList<Type>& rhs) {
-    return lhs == rhs || lhs < rhs;
+    return !(lhs < rhs);
 }
